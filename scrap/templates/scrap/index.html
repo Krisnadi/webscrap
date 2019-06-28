@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WebScrap</title>
+
+<style>
+	table, th, td {
+	    border: 1px solid black;
+	}
+
+	.loading {
+	    width: 100%;
+	    height: 100%;
+	    position: fixed;
+	    top: 0;
+	    right: 0;
+	    bottom: 0;
+	    left: 0;
+	    background-color: rgba(0,0,0,.5);
+	}
+	.loading-wheel {
+	    width: 20px;
+	    height: 20px;
+	    margin-top: -40px;
+	    margin-left: -40px;
+	    
+	    position: absolute;
+	    top: 50%;
+	    left: 50%;
+	    
+	    border-width: 30px;
+	    border-radius: 50%;
+	    -webkit-animation: spin 1s linear infinite;
+	}
+	.style-2 .loading-wheel {
+	    border-style: double;
+	    border-color: #ccc transparent;
+	}
+	@-webkit-keyframes spin {
+	    0% {
+	        -webkit-transform: rotate(0);
+	    }
+	    100% {
+	        -webkit-transform: rotate(-360deg);
+	    }
+	}
+</style>
+
+</head>
+<body>
+	{% load static %}
+	<form action="/scrap/" method="post">
+		{% csrf_token %}
+	    <label for="item">Item: </label>
+	    <input id="item" type="text" name="item" value="{{ item }}">
+	    <input id="submit" type="submit" value="OK">
+	</form>
+	<br>
+
+	<table style="width:100%">
+		<thead>
+			<tr>
+				<th width="5%">Number</th>
+				<th width="70%">Name</th>
+				<th width="10%">Price</th>
+				<th width="15%">Website</th>
+			</tr>
+		</thead>
+		<tbody id="table_row">
+		{% for item in items %}
+			<tr>
+	        	<td>{{ forloop.counter }}</td>
+	        	{% if item.url %}
+					<td><a href="{{ item.url }}" target="_blank">{{ item.name }}</a></td>
+				{% else %}
+				    <td>{{ item.name }}</td>
+				{% endif %}
+				<td align="right">${{ item.price }}</td>
+				<td>{{ item.website }}</td>
+			</tr>
+	    {% endfor %}
+		</tbody>
+	</table>
+
+	<div id="loading" class="loading style-2" style="display: none;"><div class="loading-wheel"></div></div>
+
+<script type="text/javascript" src="{% static "scrap/jquery-3.3.1.min.js" %}"></script>
+<script type="text/javascript">
+	$("#submit").click(function(){
+	    $('#loading').show();
+
+		// var settings = {
+		//     "async": true,
+		//     "crossDomain": true,
+		//     "url": "https://api.redmart.com/v1.6.0/catalog/search?q="+$('#item').val()+"&pageSize=18&sort=1024",
+		//     "method": "GET"
+		// }
+
+		// $.ajax(settings).done(function (response) {
+		// 	$("#table_row").html("");
+		//     for (var i = 0; i < response.products.length; i++) {
+		//     	content = "<tr>";
+		// 		content += "<td>"+(i+1)+"</td>";
+		// 		content += "<td>"+response.products[i].title+" ("+response.products[i].measure.wt_or_vol+")</td>";
+		// 		content += "<td align='right'>$"+response.products[i].pricing.price+"</td>";
+		// 		content += "<td>Redmart</td>";
+		// 		content += "</tr>";
+		// 		$("#table_row").append(content);
+		//     }
+		// });
+	});
+</script>
+
+</body>
+</html>
